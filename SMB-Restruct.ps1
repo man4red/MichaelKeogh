@@ -308,12 +308,38 @@ PROCESS
         break;
     }
 
+    # Client Part
     foreach ($ClientCode in (Get-ChildItem $PathClients -Depth 0)) {
         $newName = $false
-        if ($ClientCode -in $ClientCodeRenameCSV.ClientCode) {
+        if ($ClientCode.Name -in $ClientCodeRenameCSV.ClientCode) {
             $newName = $ClientCodeRenameCSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
             if($newName -and $newName.Length -ge 1) {
                 if (-not (Test-Path "$PathClients\$newName")) {
+                    try {
+                        $ClientCode | Rename-Item -NewName $newName -Force -Verbose
+                        Write-Host -ForegroundColor Green "OK: Rename `"$ClientCode => $newName`""
+                    } catch {
+                        Write-Error $_.Exception.Message
+                    }
+                } else {
+                    Write-Host -ForegroundColor Gray "Warn: `"$PathClients\$newName`" (exists)"
+                    <#try {
+                        $ClientCode | Get-ChildItem -Recurse | Move-Item -Destination "$PathClients\$newName" -Force
+                    } catch {
+                        Write-Error $_.Exception.Message
+                    }#>
+                } 
+            }
+        }
+    }
+
+    # Archive part
+    foreach ($ClientCode in (Get-ChildItem $PathArchive -Depth 0)) {
+        $newName = $false
+        if ($ClientCode.Name -in $ClientCodeRenameCSV.ClientCode) {
+            $newName = $ClientCodeRenameCSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
+            if($newName -and $newName.Length -ge 1) {
+                if (-not (Test-Path "$PathArchive\$newName")) {
                     try {
                         $ClientCode | Rename-Item -NewName $newName -Force -Verbose
                         Write-Host -ForegroundColor Green "OK: Rename `"$ClientCode => $newName`""
