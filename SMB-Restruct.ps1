@@ -45,7 +45,7 @@ param(
     [int]$ArchiveYearEarlierThan = 2017,
     
     [Parameter(Position = 6, Mandatory = $false, ValueFromPipeline=$false, ValueFromPipelineByPropertyName=$false)]
-    [string[]]$ClientCodeRenameCSV = "D:\ME\WORK\Other\Michael Keogh\DOCS\Change Client Code.csv"
+    [string[]]$ClientCodeRenameCSV = "D:\ME\WORK\Other\Michael Keogh\DOCS\ChangeClientCode.csv"
 )
 
 ###--- BEGIN EXECUTION ---###
@@ -299,8 +299,10 @@ PROCESS
             c.	Script to change all ClientCodes to Client names
     #>
 
+    Write-Host -ForegroundColor Gray "Importing csv from $ClientCodeRenameCSV ... " -NoNewline
     try {
         $ClientCodeRenameCSV = Import-CSV -Path $ClientCodeRenameCSV -Delimiter ',' -Encoding UTF8
+        Write-Host -ForegroundColor Green "OK"
     } catch {
         Write-Error $_.Exception.Message
         break;
@@ -313,7 +315,7 @@ PROCESS
             if($newName -and $newName.Length -ge 1) {
                 if (-not (Test-Path "$PathClients\$newName")) {
                     try {
-                        $ClientCode | Rename-Item -NewName $newName -Force
+                        $ClientCode | Rename-Item -NewName $newName -Force -Verbose
                         Write-Host -ForegroundColor Green "OK: Rename `"$ClientCode => $newName`""
                     } catch {
                         Write-Error $_.Exception.Message
