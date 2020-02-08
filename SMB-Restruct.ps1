@@ -243,16 +243,19 @@ PROCESS
     try { Get-Item $PathArchive -ErrorAction Stop | Out-Null } catch { Write-Error $_.Exception.Message; break; }
     foreach ($ClientCode in (Get-ChildItem $SMBRoot -Depth 0)) {
         # Year Subfolders
-        foreach ($ClientYear in ($ClientCode | Get-ChildItem)) {
+        foreach ($ClientYear in ($ClientCode | Get-ChildItem -Depth 0 | ?{ $_.PSIsContainer })) {
 
             #[int]$ClientYear.Name -lt [int]$ArchiveYearEarlierThan
-
+            
             if ($ClientYear.Name -lt $ArchiveYearEarlierThan) {
-
+                # pre-create folders
+                try {
+                    New-Item -ItemType Directory -Path "$PathArchive\$ClientCode\$ClientYear" -Force | Out-Null
+                } catch {}
                 # and now copying the existing one from SMB
                 try {
-                    $ClientYear | Copy-Item -Destination "$PathArchive\$ClientCode" -Force
-                    Write-Host -ForegroundColor Green "OK: CopyItem `"$SMBRoot\$ClientCode\$ClientYear`" -Destination `"$PathArchive\$ClientCode`""
+                    Copy-Item -Path "$SMBRoot\$ClientCode\$ClientYear" -Destination "$PathArchive\$ClientCode" -Force -Recurse
+                    Write-Host -ForegroundColor Green "OK: CopyItem `"$SMBRoot\$ClientCode\$ClientYear`" -Destination `"$PathArchive\$ClientCode\$ClientYear`""
                 } catch {
                     Write-Error $_.Exception.Message
                 }
@@ -326,7 +329,6 @@ PROCESS
             }
         }
     }
-
 }
 
 
