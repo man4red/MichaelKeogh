@@ -51,16 +51,14 @@ param(
 ###--- BEGIN EXECUTION ---###
 BEGIN
 {
-    
     # GLOBAL VARS
     # Invocation Path
     $global:path = Split-Path -parent $MyInvocation.MyCommand.Definition
-    # Output_log
-    $global:logFilePath = "$global:path\output_log.txt"
-
+    # Output_log (not implemented)
+    #$global:logFilePath = "$global:path\output_log.txt"
 
     <#        
-     # Timed prompt
+     # Timed prompt (not used yet)
      #>   
     function TimedPrompt($prompt,$secondsToWait){   
         Write-Host -NoNewline $prompt
@@ -85,23 +83,9 @@ BEGIN
     }
 }
 
-
 ###--- PROCESS EXECUTION ---###
 PROCESS
 {
-    <#
-        $SMBRoot = "d:\ME\WORK\Other\Michael Keogh\TEST\SMBRoot"
-        $PathClients = "d:\ME\WORK\Other\Michael Keogh\TEST\Clients"
-        $PathArchive = "d:\ME\WORK\Other\Michael Keogh\TEST\Archive"
-        $PathSuperseded = "d:\ME\WORK\Other\Michael Keogh\TEST\Sharepoint\Superseded"
-        $ClientIncludeYears = (2017..2020)
-        # save to archive earlier than
-        $ArchiveYearEarlierThan = 2017
-        $ClientCodeRenameCSV = "D:\ME\WORK\Other\Michael Keogh\DOCS\Change Client Code.csv"
-    #>
-
-
-
     <#
         1.	Superseded property 
             a.	James to produce a folder of all the superseded files
@@ -121,7 +105,6 @@ PROCESS
         Write-Host -ForegroundColor Red "Err`: $($_.Exception.Message)"
         return
     }
-
 
     Write-Host -ForegroundColor Gray "Calculating superseeded files' hashes... "
     $resultSuperseeded = [Collections.Generic.List[Object]]($SuperseededFiles | Get-FileHash -Algorithm MD5)
