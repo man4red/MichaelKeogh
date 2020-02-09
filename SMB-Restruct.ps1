@@ -325,41 +325,55 @@ PROCESS
     # Client Part
     foreach ($ClientCode in (Get-ChildItem $PathClients -Depth 0)) {
         $newName = $false
+        Write-Host -ForegroundColor Gray "Checking if $($ClientCode.Name) is in CSV ... " -NoNewline
         if ($ClientCode.Name -in $ClientCodeRenameCSV.ClientCode) {
+
             $newName = $ClientCodeRenameCSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
+
+            Write-Host -ForegroundColor Green "found! New name would be `"$newName`""
             if($newName -and $newName.Length -ge 1) {
+                Write-Host -ForegroundColor Gray "Checking if `"$PathClients\$newName`" not exists ... " -NoNewline
                 if (-not (Test-Path "$PathClients\$newName")) {
+                    Write-Host -ForegroundColor Green "OK"
+                    Write-Host -ForegroundColor Cyan "Renaming `"$ClientCode`" to `"$PathClients\$newName`" ... " -NoNewline
                     try {
-                        $ClientCode | Rename-Item -NewName $newName -Force -Verbose
-                        Write-Host -ForegroundColor Green "OK: Rename `"$ClientCode => $newName`""
+                        $ClientCode | Rename-Item -NewName $newName -Force
+                        Write-Host -ForegroundColor Green "OK"
                     } catch {
                         Write-Error $_.Exception.Message
                     }
                 } else {
-                    Write-Host -ForegroundColor Gray "Warn: `"$PathClients\$newName`" (exists)"
+                    Write-Host -ForegroundColor Yellow "Warn: (exists)"
                 } 
             }
-        }
+        } else {Write-Host -ForegroundColor Gray "nope" }
     }
 
     # Archive part
     foreach ($ClientCode in (Get-ChildItem $PathArchive -Depth 0)) {
         $newName = $false
+        Write-Host -ForegroundColor Gray "Checking if $($ClientCode.Name) is in CSV ... " -NoNewline
         if ($ClientCode.Name -in $ClientCodeRenameCSV.ClientCode) {
+
             $newName = $ClientCodeRenameCSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
+
+            Write-Host -ForegroundColor Green "found! New name would be `"$newName`""
             if($newName -and $newName.Length -ge 1) {
+                Write-Host -ForegroundColor Gray "Checking if `"$PathArchive\$newName`" not exists ... " -NoNewline
                 if (-not (Test-Path "$PathArchive\$newName")) {
+                    Write-Host -ForegroundColor Green "OK"
+                    Write-Host -ForegroundColor Cyan "Renaming `"$ClientCode`" to `"$PathArchive\$newName`" ... " -NoNewline
                     try {
-                        $ClientCode | Rename-Item -NewName $newName -Force -Verbose
-                        Write-Host -ForegroundColor Green "OK: Rename `"$ClientCode => $newName`""
+                        $ClientCode | Rename-Item -NewName $newName -Force
+                        Write-Host -ForegroundColor Green "OK"
                     } catch {
                         Write-Error $_.Exception.Message
                     }
                 } else {
-                    Write-Host -ForegroundColor Gray "Warn: `"$PathClients\$newName`" (exists)"
-                }
+                    Write-Host -ForegroundColor Yellow "Warn: (exists)"
+                } 
             }
-        }
+        } else {Write-Host -ForegroundColor Gray "nope" }
     }
 }
 
