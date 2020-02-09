@@ -300,13 +300,21 @@ PROCESS
             c.	Script to change all ClientCodes to Client names
     #>
 
+    $CSV = $false
+
     Write-Host -ForegroundColor Gray "Importing csv from $ClientCodeRenameCSV ... " -NoNewline
     try {
-        $ClientCodeRenameCSV = Import-CSV -Path $ClientCodeRenameCSV -Delimiter ',' -Encoding UTF8
+        $CSV = Import-CSV -Path $ClientCodeRenameCSV -Delimiter ',' -Encoding UTF8
         Write-Host -ForegroundColor Green "OK"
 
         Write-Host -ForegroundColor Gray "Checking csv for required columns... " -NoNewline
-        $CSVColumns = ($ClientCodeRenameCSV | gm -MemberType NoteProperty)
+        $CSVColumns = ($CSV | gm -MemberType NoteProperty)
+
+        Write-Host -ForegroundColor Cyan "CSV Content"
+        $CSV | ft
+
+        Write-Host -ForegroundColor Cyan "CSV Columns"
+        $CSVColumns | ft
 
         if ("ClientCode" -inotin $CSVColumns.Name) {
             Write-Error "ClientCode is missing from CSV"
@@ -317,10 +325,14 @@ PROCESS
         } else {
             Write-Host -ForegroundColor Green "CSV looks okay..."
         }
+
     } catch {
         Write-Error $_.Exception.Message
         break;
     }
+
+
+
 
     # Client Part
     foreach ($ClientCode in (Get-ChildItem $PathClients -Depth 0)) {
@@ -328,7 +340,7 @@ PROCESS
         Write-Host -ForegroundColor Gray "Checking if $($ClientCode.Name) is in CSV ... " -NoNewline
         if ($ClientCode.Name -in $ClientCodeRenameCSV.ClientCode) {
 
-            $newName = $ClientCodeRenameCSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
+            $newName = $CSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
 
             Write-Host -ForegroundColor Green "found! New name would be `"$newName`""
             if($newName -and $newName.Length -ge 1) {
@@ -355,7 +367,7 @@ PROCESS
         Write-Host -ForegroundColor Gray "Checking if $($ClientCode.Name) is in CSV ... " -NoNewline
         if ($ClientCode.Name -in $ClientCodeRenameCSV.ClientCode) {
 
-            $newName = $ClientCodeRenameCSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
+            $newName = $CSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
 
             Write-Host -ForegroundColor Green "found! New name would be `"$newName`""
             if($newName -and $newName.Length -ge 1) {
