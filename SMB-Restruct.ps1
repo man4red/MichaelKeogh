@@ -13,11 +13,12 @@
   None
 
 .NOTES
-  Version:        1.1
+  Version:        1.2
   Author:         man4red (it.manfred@gmail.com)
   Creation Date:  29.01.2020
   Purpose/Change: Initial script development
   1.1 - Superseded behavior changed
+  1.2 - Superseded behavior changed (now it's -Superseded instead of _Superseded)
   
 .EXAMPLE
   SMB-Restruct.ps1
@@ -135,13 +136,13 @@ PROCESS
                 if ($index.Count -eq 1) {
                     Write-Host -ForegroundColor Green "`tSingle match were found $($resultSuperseeded[$index].Path) ($($resultSuperseeded[$index].Hash))"
                     
-                    if ($DestinationFile.Name -ilike "*_Superseded*") {
+                    if ($DestinationFile.Name -ilike "*-Superseded*") {
                         Write-Host -ForegroundColor DarkYellow "`t`tSkipping already renamed file`: $($DestinationFile.FullName)..."
                         continue
                     }
 
                     try {
-                        $newName = $DestinationFile.Name -replace $DestinationFile.Extension, "_Superseded$($DestinationFile.Extension)"
+                        $newName = $DestinationFile.Name -replace $DestinationFile.Extension, "-Superseded$($DestinationFile.Extension)"
                         $DestinationFile | Rename-Item -NewName $newName
                         Write-Host -ForegroundColor Magenta "`t`t`tOK: FileRename $($DestinationFile.FullName) => ($newName)"
                     } catch {
