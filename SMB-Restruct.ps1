@@ -304,6 +304,19 @@ PROCESS
     try {
         $ClientCodeRenameCSV = Import-CSV -Path $ClientCodeRenameCSV -Delimiter ',' -Encoding UTF8
         Write-Host -ForegroundColor Green "OK"
+
+        Write-Host -ForegroundColor Gray "Checking csv for required columns... " -NoNewline
+        $CSVColumns = ($ClientCodeRenameCSV | gm -MemberType NoteProperty)
+
+        if ("ClientCode" -inotin $CSVColumns.Name) {
+            Write-Error "ClientCode is missing from CSV"
+            return
+        } elseif ("EntityName" -inotin $CSVColumns.Name) {
+            Write-Error "EntityName is missing from CSV"
+            return
+        } else {
+            Write-Host -ForegroundColor Green "CSV looks okay..."
+        }
     } catch {
         Write-Error $_.Exception.Message
         break;
@@ -324,11 +337,6 @@ PROCESS
                     }
                 } else {
                     Write-Host -ForegroundColor Gray "Warn: `"$PathClients\$newName`" (exists)"
-                    <#try {
-                        $ClientCode | Get-ChildItem -Recurse | Move-Item -Destination "$PathClients\$newName" -Force
-                    } catch {
-                        Write-Error $_.Exception.Message
-                    }#>
                 } 
             }
         }
@@ -349,11 +357,6 @@ PROCESS
                     }
                 } else {
                     Write-Host -ForegroundColor Gray "Warn: `"$PathClients\$newName`" (exists)"
-                    <#try {
-                        $ClientCode | Get-ChildItem -Recurse | Move-Item -Destination "$PathClients\$newName" -Force
-                    } catch {
-                        Write-Error $_.Exception.Message
-                    }#>
                 }
             }
         }
