@@ -142,7 +142,7 @@ PROCESS
 
                     try {
                         $newName = $DestinationFile.Name -replace $DestinationFile.Extension, "_Superseded$($DestinationFile.Extension)"
-                        $DestinationFile | Rename-Item -NewName $newName -WhatIf
+                        $DestinationFile | Rename-Item -NewName $newName
                         Write-Host -ForegroundColor Magenta "`t`t`tOK: FileRename $($DestinationFile.FullName) => ($newName)"
                     } catch {
                         Write-Error $_.Exception.Message
