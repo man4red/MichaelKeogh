@@ -310,11 +310,11 @@ PROCESS
         Write-Host -ForegroundColor Gray "Checking csv for required columns... " -NoNewline
         $CSVColumns = ($CSV | gm -MemberType NoteProperty)
 
-        Write-Host -ForegroundColor Cyan "CSV Content"
-        $CSV | ft
+        #Write-Host -ForegroundColor Cyan "CSV Content"
+        #$CSV | ft
 
-        Write-Host -ForegroundColor Cyan "CSV Columns"
-        $CSVColumns | ft
+        #Write-Host -ForegroundColor Cyan "CSV Columns"
+        #$CSVColumns | ft
 
         if ("ClientCode" -inotin $CSVColumns.Name) {
             Write-Error "ClientCode is missing from CSV"
@@ -338,7 +338,7 @@ PROCESS
     foreach ($ClientCode in (Get-ChildItem $PathClients -Depth 0)) {
         $newName = $false
         Write-Host -ForegroundColor Gray "Checking if $($ClientCode.Name) is in CSV ... " -NoNewline
-        if ($ClientCode.Name -in $ClientCodeRenameCSV.ClientCode) {
+        if ($ClientCode.Name -in $CSV.ClientCode) {
 
             $newName = $CSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
 
@@ -365,7 +365,7 @@ PROCESS
     foreach ($ClientCode in (Get-ChildItem $PathArchive -Depth 0)) {
         $newName = $false
         Write-Host -ForegroundColor Gray "Checking if $($ClientCode.Name) is in CSV ... " -NoNewline
-        if ($ClientCode.Name -in $ClientCodeRenameCSV.ClientCode) {
+        if ($ClientCode.Name -in $CSV.ClientCode) {
 
             $newName = $CSV.Where({$PSItem.ClientCode -eq $ClientCode.Name}).EntityName
 
