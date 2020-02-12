@@ -13,12 +13,13 @@
   None
 
 .NOTES
-  Version:        1.2
+  Version:        1.3
   Author:         man4red (it.manfred@gmail.com)
   Creation Date:  29.01.2020
   Purpose/Change: Initial script development
   1.1 - Superseded behavior changed
   1.2 - Superseded behavior changed (now it's -Superseded instead of _Superseded)
+  1.3 - Remove version text from filename behavior changed
   
 .EXAMPLE
   SMB-Restruct.ps1
@@ -372,7 +373,7 @@ PROCESS
                     Write-Host -ForegroundColor Yellow "Warn: (exists)"
                 } 
             }
-        } else {Write-Host -ForegroundColor Gray "nope" }
+        } else {Write-Host -ForegroundColor Yellow "nope" }
     }
 
     # Archive part
@@ -399,7 +400,7 @@ PROCESS
                     Write-Host -ForegroundColor Yellow "Warn: (exists)"
                 } 
             }
-        } else {Write-Host -ForegroundColor Gray "nope" }
+        } else {Write-Host -ForegroundColor Yellow "nope" }
     }
 }
 
