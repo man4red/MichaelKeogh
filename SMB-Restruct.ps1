@@ -167,7 +167,6 @@ PROCESS
         }
     }
 
-
     ######## CLIENTS #########
     <#
         2.	Client library
@@ -180,13 +179,13 @@ PROCESS
     if (-not (Test-Path $PathClients)) {
         try {
             New-Item -ItemType Directory -Path $PathClients | Out-Null
-            Write-Host -ForegroundColor Green "OK: $PathClients"
+            #Write-Host -ForegroundColor Green "OK: $PathClients"
         } catch {
             Write-Error "Error: create archive $PathClients"
             return
         }
     } else {
-        Write-Host -ForegroundColor Gray "OK: $PathClients (exists)"
+        #Write-Host -ForegroundColor Gray "OK: $PathClients (exists)"
     }
 
     try { Get-Item $PathClients -ErrorAction Stop | Out-Null } catch { Write-Error $_.Exception.Message; break; }
@@ -196,12 +195,12 @@ PROCESS
             if (-not (Test-Path "$PathClients\$ClientCode\$ClientYear")) {
                 try {
                     New-Item -ItemType Directory -Path "$PathClients\$ClientCode\$ClientYear" -Force | Out-Null
-                    Write-Host -ForegroundColor Green "OK: `"$PathClients\$ClientCode\$ClientYear`" created"
+                    #Write-Host -ForegroundColor Green "OK: `"$PathClients\$ClientCode\$ClientYear`" created"
                 } catch {
                     Write-Error $_.Exception.Message
                 }
             } else {
-                Write-Host -ForegroundColor Gray "OK: `"$PathClients\$ClientCode\$ClientYear`" (exists)"
+                #Write-Host -ForegroundColor Gray "OK: `"$PathClients\$ClientCode\$ClientYear`" (exists)"
             }
 
 
@@ -232,13 +231,13 @@ PROCESS
     if (-not (Test-Path $PathArchive)) {
         try {
             New-Item -ItemType Directory -Path $PathArchive | Out-Null
-            Write-Host -ForegroundColor Green "OK: $PathArchive"
+            #Write-Host -ForegroundColor Green "OK: $PathArchive"
         } catch {
             Write-Error "Error: create archive $PathArchive"
             return
         }
     } else {
-        Write-Host -ForegroundColor Gray "OK: $PathArchive (exists)"
+        #Write-Host -ForegroundColor Gray "OK: $PathArchive (exists)"
     }
 
     try { Get-Item $PathArchive -ErrorAction Stop | Out-Null } catch { Write-Error $_.Exception.Message; break; }
@@ -274,12 +273,30 @@ PROCESS
             e.	Eg: FactorHoldings_Y5399U.docx change to FactorHoldings.docx
     #>
 
-
     try { Get-Item $PathClients -ErrorAction Stop | Out-Null } catch { Write-Error $_.Exception.Message; break; }
     foreach ($ClientCode in (Get-ChildItem $PathClients -Depth 0)) {
-        $ClientCode | Get-ChildItem -File -Recurse | %{
-            if ($_.Name -match "(_(?!.*_).*?)\.") {
-                $newName = $_.Name -replace $Matches[1], ""
+
+        $files = Get-ChildItem -File -Recurse -Path $ClientCode.FullName
+        $files | %{
+            if($_.FullName -match "(?<Path>.*\\)(?<NameP1>.*)(?<VerP1>_(?!.*_|.*Superseded).*?)\.") {
+                $_ | Add-Member -NotePropertyName NameP1 -NotePropertyValue $Matches.NameP1
+                $_ | Add-Member -NotePropertyName VerP1 -NotePropertyValue $Matches.VerP1
+                $_ | Add-Member -NotePropertyName VerP2 -NotePropertyValue ([int64]($Matches.VerP1 -replace '\D+(\d+)','$1'))
+            }
+        }
+
+        $files | ? NameP1 -ne $null | Sort-Object VerP2 -CaseSensitive:$false | Group-Object -Property NameP1 | %{
+            $v=1;
+            $count = $_.Count
+            $_.Group | %{
+
+                if ($v -eq $count) {
+                    # Don't add $v for the latest file
+                    $newName = $_.Name -replace $_.VerP1, ""
+                } else {
+                    $newName = $_.Name -replace $_.VerP1, "($v)"
+                }
+
                 try {
                      $newPath = Join-Path -Path $_.Directory -ChildPath $newName
                      $_ | Move-Item -Destination $newPath -Force
@@ -287,10 +304,10 @@ PROCESS
                 } catch {
                     Write-Error $_.Exception.Message
                 }
+                $v++
             }
         }
     }
-
 
         
     <#
@@ -330,9 +347,6 @@ PROCESS
         Write-Error $_.Exception.Message
         break;
     }
-
-
-
 
     # Client Part
     foreach ($ClientCode in (Get-ChildItem $PathClients -Depth 0)) {
@@ -388,7 +402,6 @@ PROCESS
         } else {Write-Host -ForegroundColor Gray "nope" }
     }
 }
-
 
 ###--- END EXECUTION ---###
 END
