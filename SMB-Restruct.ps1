@@ -57,7 +57,10 @@ BEGIN
     # Invocation Path
     $global:path = Split-Path -parent $MyInvocation.MyCommand.Definition
     # Output_log (not implemented)
-    #$global:logFilePath = "$global:path\output_log.txt"
+    $global:logFilePath = "$global:path\output_log.txt"
+    try {
+        Start-Transcript $global:logFilePath -Force
+    } catch {}
 
     <#        
      # Timed prompt (not used yet)
@@ -408,4 +411,7 @@ PROCESS
 END
 {
     Write-Host ("--------")
+    try {
+        Stop-Transcript
+    } catch {}
 }
